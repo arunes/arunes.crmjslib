@@ -1,1 +1,2 @@
-crmjslib is helper javascript class for using Microsoft Dynamics Crm 2011 javascript SDK.
+arunes.crmjslib is helper javascript class for Microsoft Dynamics Crm 2011.
+Some functions requires jQuery 1.7+
