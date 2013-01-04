@@ -1,6 +1,6 @@
 ﻿/* 
-arunes.crmjslib v1.0.1 
-last update: 2012-11-03 11:10
+arunes.crmjslib v1.0.2
+last update: 2013-01-04 16:56 +2 GMT
 */
 
 // class and constructor
@@ -199,13 +199,13 @@ function arunesCrmJsLib() {
     this.getSoapUrl = function () { return this.getServerUrl() + "/XRMServices/2011/Organization.svc/web"; }
 
     // get entity with id
-    this.retrieveOne = function (entity, id, callback) {
+    this.retrieveOne = function (entity, id, callback, async) {
         if (jQuery) {
             var serviceUrl = this.getServiceUrl();
             var select = "/" + entity + "Set(guid'" + id + "')";
 
             $.ajax({
-                async: this.async,
+                async: async != undefined ? async : this.async,
                 type: "GET",
                 contentType: "application/json; charset=utf-8",
                 datatype: "json",
@@ -224,13 +224,13 @@ function arunesCrmJsLib() {
     }
 
     // get entity(s) with query
-    this.retrieveWithQuery = function (entity, query, callback) {
+    this.retrieveWithQuery = function (entity, query, callback, async) {
         if (jQuery) {
             var serviceUrl = this.getServiceUrl();
             var select = "/" + entity + "Set?" + query;
 
             $.ajax({
-                async: this.async,
+                async: async != undefined ? async : this.async,
                 type: "GET",
                 contentType: "application/json; charset=utf-8",
                 datatype: "json",
@@ -249,13 +249,13 @@ function arunesCrmJsLib() {
     }
 
     // update entity
-    this.updateEntity = function (entity, id, changes, callback) {
+    this.updateEntity = function (entity, id, changes, callback, async) {
         if (jQuery) {
             var serviceUrl = this.getServiceUrl();
             var select = "/" + entity + "Set(guid'" + id + "')";
             var jsonEntity = top.window.JSON.stringify(changes);
             $.ajax({
-                async: this.async,
+                async: async != undefined ? async : this.async,
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
                 datatype: "json",
@@ -285,13 +285,13 @@ function arunesCrmJsLib() {
     }
 
     // create entity
-    this.createRecord = function (entity, newEntity, callback) {
+    this.createRecord = function (entity, newEntity, callback, async) {
         if (jQuery) {
             var serviceUrl = $$.getServiceUrl();
             var select = "/" + entity + "Set";
             var jsonEntity = top.window.JSON.stringify(newEntity);
             $.ajax({
-                async: this.async,
+                async: async != undefined ? async : this.async,
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
                 datatype: "json",
@@ -317,12 +317,12 @@ function arunesCrmJsLib() {
     }
 
     // delete entity
-    this.deleteRecord = function (entity, id, callback) {
+    this.deleteRecord = function (entity, id, callback, async) {
         if (jQuery) {
             var serviceUrl = this.getServiceUrl();
             var select = "/" + entity + "Set(guid'" + id + "')";
             $.ajax({
-                async: this.async,
+                async: async != undefined ? async : this.async,
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
                 datatype: "json",
@@ -439,6 +439,13 @@ function arunesCrmJsLib() {
     this.setProperCase = function (elmId) {
         var txt = this.getValue(elmId);
         this.setValue(elmId, this.toProperCase(txt));
+    }
+
+    // checks two guids are equal
+    this.areGuidsEqual = function(guid1, guid2) {
+        guid1 = guid1.toString().replace(/[{}]/g, '').toLowerCase();
+        guid2 = guid2.toString().replace(/[{}]/g, '').toLowerCase();
+        return guid1 === guid2;
     }
 
     // open entity rec
