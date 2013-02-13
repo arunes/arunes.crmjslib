@@ -1,6 +1,6 @@
 ﻿/* 
-arunes.crmjslib v1.0.2
-last update: 2013-01-04 16:56 +2 GMT
+arunes.crmjslib v1.0.4
+last update: 2013-02-13 16:47 +2 GMT
 */
 
 // class and constructor
@@ -9,7 +9,7 @@ function arunesCrmJsLib() {
     this.async = true;
 
     // if content in iframe
-    if (Xrm == undefined || Xrm.Page.getAttribute == undefined)
+    if (typeof Xrm === 'undefined' || Xrm.Page.getAttribute == undefined)
         Xrm = parent.Xrm;
 
     // get elm. value
@@ -20,6 +20,9 @@ function arunesCrmJsLib() {
 
     // get current user id
     this.getUserId = function () { return Xrm.Page.context.getUserId(); }
+
+    // get current entity name
+    this.getEntityName = function () { return Xrm.Page.data.entity.getEntityName(); }
 
     // get submit mode
     this.getSubmitMode = function (elmId) { return Xrm.Page.getAttribute(elmId).getSubmitMode(); }
@@ -84,7 +87,12 @@ function arunesCrmJsLib() {
 
     // set frame url
     this.setFrameUrl = function (elmId, url) {
-        Xrm.Page.getControl(elmId).setSrc(url);
+        this.getControl(elmId).setSrc(url);
+    }
+
+    // reload frame
+    this.reloadFrame = function (elmId) {
+        this.setFrameUrl(elmId, this.getControl(elmId).getSrc())
     }
 
     // add or replace parameter value of querystring
@@ -442,11 +450,11 @@ function arunesCrmJsLib() {
     }
 
     // checks two guids are equal
-    this.areGuidsEqual = function(guid1, guid2) {
+    this.areGuidsEqual = function (guid1, guid2) {
         guid1 = guid1.toString().replace(/[{}]/g, '').toLowerCase();
         guid2 = guid2.toString().replace(/[{}]/g, '').toLowerCase();
         return guid1 === guid2;
-    }
+    };
 
     // open entity rec
     this.openEntity = function (entiyName, id) {
@@ -457,7 +465,40 @@ function arunesCrmJsLib() {
         var left = ((screen.width - width) / 2);
         var windowName = entiyName + id.replace(/-/gi, '')
         window.open(url, windowName, 'width=1020,height=' + height + ',top=0,left=' + left + ', scrollbars=0,resizable=1');
-    }
+    };
+
+    // mask input value
+    this.mask = function (elmId, m) {
+        //+ Jonas Raoni Soares Silva
+        //@ http://jsfromhell.com/forms/masked-input [rev. #1]
+        // modified for crm 2011 by arunes
+
+        var f = $("#" + elmId)[0];
+        if (typeof f === "undefined") return;
+        if (f.type != "text") return;
+
+        function mask(e) {
+            var patterns = { "1": /[A-Z]/i, "2": /[0-9]/, "4": /[\xC0-\xFF]/i, "8": /./ },
+                rules = { "a": 3, "A": 7, "9": 2, "C": 5, "c": 1, "*": 8 };
+            function accept(c, rule) {
+                for (var i = 1, r = rules[rule] || 0; i <= r; i <<= 1)
+                    if (r & i && patterns[i].test(c))
+                        break;
+                return i <= r || c == rule;
+            }
+            var k, r, c = String.fromCharCode(k = (e.keyCode ? e.keyCode : e.which)), l = f.value.length;
+            (!k || k == 8 ? 1 : (r = /^(.)\^(.*)$/.exec(m)) && (r[0] = r[2].indexOf(c) + 1) + 1 ?
+                r[1] == "O" ? r[0] : r[1] == "E" ? !r[0] : accept(c, r[1]) || r[0]
+                : (l = (f.value += m.substr(l, (r = /[A|9|C|\*]/i.exec(m.substr(l))) ?
+                r.index : l)).length) < m.length && accept(c, m.charAt(l))) || e.preventDefault();
+        }
+
+        $(f).keyup(function () { $$.setValue(this.id, this.value); });
+        $(f).blur(function () { if (this.value.length < this.maxLength) this.value = ""; });
+        for (var i in !/^(.)\^(.*)$/.test(m) && (f.maxLength = m.length), { keypress: 0, keyup: 1 }) {
+            $(f).bind(i, mask);
+        }
+    };
 
     this.getOptionSetLabel = function (EntityLogicalName, LogicalName, MetadataId, RetrieveAsIfPublished, attributeValue) {
         var request = "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">";
@@ -625,7 +666,6 @@ function arunesCrmJsLib() {
         }
         return new Error(errorMessage);
     }
-
 }
 
 // define $$ object of window
