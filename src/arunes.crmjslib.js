@@ -1,6 +1,6 @@
 ﻿/* 
-arunes.crmjslib v1.0.4
-last update: 2013-02-13 16:47 +2 GMT
+arunes.crmjslib v1.0.5
+last update: 2013-02-20 15:51 +2 GMT
 */
 
 // class and constructor
@@ -13,22 +13,22 @@ function arunesCrmJsLib() {
         Xrm = parent.Xrm;
 
     // get elm. value
-    this.getValue = function (elmId) { return Xrm.Page.getAttribute(elmId).getValue(); }
+    this.getValue = function (elmId) { return Xrm.Page.getAttribute(elmId).getValue(); };
 
     // get current form's guid
-    this.getCurrentId = function () { return Xrm.Page.data.entity.getId(); }
+    this.getCurrentId = function () { return Xrm.Page.data.entity.getId(); };
 
     // get current user id
-    this.getUserId = function () { return Xrm.Page.context.getUserId(); }
+    this.getUserId = function () { return Xrm.Page.context.getUserId(); };
 
     // get current entity name
-    this.getEntityName = function () { return Xrm.Page.data.entity.getEntityName(); }
+    this.getEntityName = function () { return Xrm.Page.data.entity.getEntityName(); };
 
     // get submit mode
-    this.getSubmitMode = function (elmId) { return Xrm.Page.getAttribute(elmId).getSubmitMode(); }
+    this.getSubmitMode = function (elmId) { return Xrm.Page.getAttribute(elmId).getSubmitMode(); };
 
     // get if value has changed
-    this.isValueChanged = function (elmId) { return Xrm.Page.getAttribute(elmId).getIsDirty(); }
+    this.isValueChanged = function (elmId) { return Xrm.Page.getAttribute(elmId).getIsDirty(); };
 
     // get elm. text (for picklists, lookups)
     this.getText = function (elmId) {
@@ -43,10 +43,10 @@ function arunesCrmJsLib() {
             }
         }
         return null;
-    }
+    };
 
     // set elm. value
-    this.setValue = function (elmId, val) { Xrm.Page.getAttribute(elmId).setValue(val); }
+    this.setValue = function (elmId, val) { Xrm.Page.getAttribute(elmId).setValue(val); };
 
     // set lookup value
     this.setLookupValue = function (elmId, id, name, type) {
@@ -56,13 +56,13 @@ function arunesCrmJsLib() {
         lookupValue[0].name = name;
         lookupValue[0].entityType = type;
         this.setValue(elmId, lookupValue);
-    }
+    };
 
     // set elm. disable
-    this.setDisabled = function (elmId, disable) { Xrm.Page.ui.controls.get(elmId).setDisabled(disable); }
+    this.setDisabled = function (elmId, disable) { Xrm.Page.ui.controls.get(elmId).setDisabled(disable); };
 
     // set elm. visibility
-    this.setVisible = function (elmId, visible) { Xrm.Page.ui.controls.get(elmId).setVisible(visible); }
+    this.setVisible = function (elmId, visible) { Xrm.Page.ui.controls.get(elmId).setVisible(visible); };
 
     // set tab/section visibility
     this.setVisibleTabSection = function (tabname, sectionname, show) {
@@ -78,7 +78,7 @@ function arunesCrmJsLib() {
                 }
             }
         }
-    }
+    };
 
     // get control
     this.getControl = function (elmId) {
@@ -88,12 +88,12 @@ function arunesCrmJsLib() {
     // set frame url
     this.setFrameUrl = function (elmId, url) {
         this.getControl(elmId).setSrc(url);
-    }
+    };
 
     // reload frame
     this.reloadFrame = function (elmId) {
-        this.setFrameUrl(elmId, this.getControl(elmId).getSrc())
-    }
+        this.setFrameUrl(elmId, this.getControl(elmId).getSrc());
+    };
 
     // add or replace parameter value of querystring
     this.addValueToQueryString = function (key, value, queryString) {
@@ -101,7 +101,7 @@ function arunesCrmJsLib() {
             if (document.location.href.split('?')[1] != null) {
                 queryString = document.location.href.split('?')[1];
             } else {
-                return;
+                return "?" + key + "=" + value;
             }
         }
 
@@ -126,7 +126,7 @@ function arunesCrmJsLib() {
         } else {
             return "?" + key + "=" + value;
         }
-    }
+    };
 
     // set requirement level [None, Recommended, Required]
     this.setRequirementLevel = function (elmId, level) {
@@ -134,10 +134,10 @@ function arunesCrmJsLib() {
     };
 
     // get crm form type (0:Undefined, 1:Create, 2:Update, 3:Read Only, 4:Disabled, 5:Quick Create (Deprecated), 6:Bulk Edit)
-    this.getFormType = function () { return Xrm.Page.ui.getFormType(); }
+    this.getFormType = function () { return Xrm.Page.ui.getFormType(); };
 
     // set focus on element
-    this.setFocus = function (elmId) { Xrm.Page.ui.controls.get(elmId).setFocus(); }
+    this.setFocus = function (elmId) { Xrm.Page.ui.controls.get(elmId).setFocus(); };
 
     // multiple select picklist
     this.makeMultipleSelect = function (orgPicklist, txtPicklist, valPicklist, size) {
@@ -153,7 +153,7 @@ function arunesCrmJsLib() {
 
         var selected = $$.getValue(valPicklist);
         if (selected != null) { $.each(selected.split(','), function (i, val) { $("#" + orgPicklist + " option[value='" + val + "']").attr('selected', 'selected'); }); }
-    }
+    };
 
     // makes two picklists related
     this.makePicklistRelated = function (parent, child) {
@@ -178,7 +178,7 @@ function arunesCrmJsLib() {
         });
 
         pPicklist.change();
-    }
+    };
 
     // get server url
     this.getServerUrl = function () {
@@ -198,13 +198,13 @@ function arunesCrmJsLib() {
         catch (Error) {
             return Xrm.Page.context.getServerUrl(); // default dönsün
         }
-    }
+    };
 
     // get service url
-    this.getServiceUrl = function () { return this.getServerUrl() + "/XRMServices/2011/OrganizationData.svc"; }
+    this.getServiceUrl = function () { return this.getServerUrl() + "/XRMServices/2011/OrganizationData.svc"; };
 
     // get soap url
-    this.getSoapUrl = function () { return this.getServerUrl() + "/XRMServices/2011/Organization.svc/web"; }
+    this.getSoapUrl = function () { return this.getServerUrl() + "/XRMServices/2011/Organization.svc/web"; };
 
     // get entity with id
     this.retrieveOne = function (entity, id, callback, async) {
@@ -229,7 +229,7 @@ function arunesCrmJsLib() {
         } else {
             alert('jQuery required!');
         }
-    }
+    };
 
     // get entity(s) with query
     this.retrieveWithQuery = function (entity, query, callback, async) {
@@ -254,7 +254,7 @@ function arunesCrmJsLib() {
         } else {
             alert('jQuery required!');
         }
-    }
+    };
 
     // update entity
     this.updateEntity = function (entity, id, changes, callback, async) {
@@ -290,7 +290,7 @@ function arunesCrmJsLib() {
         } else {
             alert('jQuery required!');
         }
-    }
+    };
 
     // create entity
     this.createRecord = function (entity, newEntity, callback, async) {
@@ -322,7 +322,7 @@ function arunesCrmJsLib() {
         } else {
             alert('jQuery required!');
         }
-    }
+    };
 
     // delete entity
     this.deleteRecord = function (entity, id, callback, async) {
@@ -355,7 +355,7 @@ function arunesCrmJsLib() {
         } else {
             alert('jQuery required!');
         }
-    }
+    };
 
     // sort table
     this.sortTable = function (table, columnIndex, desc) {
@@ -370,7 +370,7 @@ function arunesCrmJsLib() {
         } else {
             alert('jQuery required!');
         }
-    }
+    };
 
     //get formatted date
     this.getFormattedDate = function (date, format) {
@@ -386,12 +386,12 @@ function arunesCrmJsLib() {
             .replace('ss', (d.getSeconds() < 10 ? '0' : '') + d.getSeconds());
 
         return retVal;
-    }
+    };
 
     // parses JSON dates (Date(1111111111) values)
     this.parseJSONDate = function (val) {
         return new Date(parseInt(val.replace("/Date(", "").replace(")/", ""), 10));
-    }
+    };
 
     // get querystring
     this.queryString = function (key) {
@@ -403,25 +403,25 @@ function arunesCrmJsLib() {
                 return cVar[1];
             }
         }
-    }
+    };
 
     // returns nullstr if obj is null else return itself
     this.ifNull = function (val, nullStr) {
         nullStr = nullStr != undefined ? nullStr : '---';
         return (val == null || val == '') ? nullStr : val;
-    }
+    };
 
     // convert text to upper case
     this.toUpperCase = function (txt) {
         txt = txt === null ? '' : txt;
         return txt.replace(/ı/g, 'I').replace(/i/g, 'İ').toUpperCase();
-    }
+    };
 
     // convert text to lower case
     this.toLowerCase = function (txt) {
         txt = txt === null ? '' : txt;
         return txt.replace(/I/g, 'ı').replace(/İ/g, 'i').toLowerCase();
-    }
+    };
 
     // convert text to proper case
     this.toProperCase = function (txt) {
@@ -429,25 +429,25 @@ function arunesCrmJsLib() {
         return txt.replace(/\w\S*/g, function (txt) {
             return $$.toUpperCase(txt.charAt(0)) + $$.toLowerCase(txt.substr(1));
         });
-    }
+    };
 
     // set upper case text to textfield, textarea
     this.setUpperCase = function (elmId) {
         var txt = this.getValue(elmId);
         this.setValue(elmId, this.toUpperCase(txt));
-    }
+    };
 
     // set upper case text to textfield, textarea
     this.setLowerCase = function (elmId) {
         var txt = this.getValue(elmId);
         this.setValue(elmId, this.toLowerCase(txt));
-    }
+    };
 
     // set proper case text to textfield, textarea
     this.setProperCase = function (elmId) {
         var txt = this.getValue(elmId);
         this.setValue(elmId, this.toProperCase(txt));
-    }
+    };
 
     // checks two guids are equal
     this.areGuidsEqual = function (guid1, guid2) {
@@ -463,7 +463,7 @@ function arunesCrmJsLib() {
         var width = 1020;
         var height = screen.height - 50;
         var left = ((screen.width - width) / 2);
-        var windowName = entiyName + id.replace(/-/gi, '')
+        var windowName = entiyName + id.replace(/-/gi, '');
         window.open(url, windowName, 'width=1020,height=' + height + ',top=0,left=' + left + ', scrollbars=0,resizable=1');
     };
 
@@ -536,37 +536,46 @@ function arunesCrmJsLib() {
         req.setRequestHeader("SOAPAction", "http://schemas.microsoft.com/xrm/2011/Contracts/Services/IOrganizationService/Execute");
         req.send(request);
 
+        var namespaces = { a: "http://schemas.microsoft.com/xrm/2011/Contracts", b: "http://schemas.datacontract.org/2004/07/System.Collections.Generic", c: "http://schemas.microsoft.com/xrm/2011/Metadata" };
+
         if (req.responseXML != null) {
-            var attributeData = req.responseXML.selectSingleNode("//b:value");
+            var attributeData = $$.selectSingleNode(req.responseXML, "//b:value", namespaces);
+
             if (attributeData != null) {
-                var attributeType = attributeData.selectSingleNode("c:AttributeType").text;
+                var nAttributeType = $$.selectSingleNode(attributeData, "c:AttributeType", namespaces);
+                var attributeType = nAttributeType.text || nAttributeType.textContent;
 
                 switch (attributeType) {
                     case "Picklist":
-                        return getPickListTextValue(attributeData, attributeValue);
-                        break;
+                        return $$.getPickListTextValue(attributeData, attributeValue, namespaces);
                     default:
                         break;
                 }
-
-                function getPickListTextValue(attributeData, attributeValue) {
-                    var options = attributeData.selectSingleNode("c:OptionSet//c:Options");
-                    for (var i = 0; i < options.childNodes.length; i++) {
-                        var value = options.childNodes[i].selectSingleNode("c:Value").text;
-                        if (value == attributeValue) {
-                            var text = options.childNodes[i].selectSingleNode("c:Label").selectSingleNode("a:UserLocalizedLabel").selectSingleNode("a:Label").text;
-                            return text;
-                        }
-                    }
-                }
             }
         }
-    }
+    };
+
+    // for internal use only
+    this.getPickListTextValue = function (aData, aValue, namespaces) {
+        var options = $$.selectSingleNode(aData, "c:OptionSet//c:Options", namespaces);
+        for (var i = 0; i < options.childNodes.length; i++) {
+            var nValue = $$.selectSingleNode(options.childNodes[i], "c:Value", namespaces);
+            var value = nValue.text || nValue.textContent;
+
+            if (value == aValue) {
+                var cLabel = $$.selectSingleNode(options.childNodes[i], "c:Label", namespaces);
+                var locLabel = $$.selectSingleNode(cLabel, "a:UserLocalizedLabel", namespaces);
+                var nText = $$.selectSingleNode(locLabel, "a:Label", namespaces);
+                var text = nText.text || nText.textContent;
+                return text;
+            }
+        }
+    };
 
     this.setState = function (entity, id, state, status, successCallback, errorCallback) {
         successCallback = successCallback == undefined ? null : successCallback;
         errorCallback = errorCallback == undefined ? null : errorCallback;
-        var requestMain = ""
+        var requestMain = "";
         requestMain += "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">";
         requestMain += "  <s:Body>";
         requestMain += "    <Execute xmlns=\"http://schemas.microsoft.com/xrm/2011/Contracts/Services\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">";
@@ -600,8 +609,7 @@ function arunesCrmJsLib() {
         requestMain += "  </s:Body>";
         requestMain += "</s:Envelope>";
         var req = new XMLHttpRequest();
-        req.open("POST", this.getSoapUrl(), true)
-        // Responses will return XML. It isn't possible to return JSON.
+        req.open("POST", this.getSoapUrl(), true); // Responses will return XML. It isn't possible to return JSON.
         req.setRequestHeader("Accept", "application/xml, text/xml, */*");
         req.setRequestHeader("Content-Type", "text/xml; charset=utf-8");
         req.setRequestHeader("SOAPAction", "http://schemas.microsoft.com/xrm/2011/Contracts/Services/IOrganizationService/Execute");
@@ -665,7 +673,36 @@ function arunesCrmJsLib() {
             catch (e) { };
         }
         return new Error(errorMessage);
-    }
+    };
+
+    this.selectSingleNode = function (context, expression, namespaces) {
+        var doc = (context.nodeType != 9 ? context.ownerDocument : context);
+
+        if (typeof doc.evaluate != "undefined") {
+            var nsresolver = null;
+            if (namespaces instanceof Object) {
+                nsresolver = function (prefix) { return namespaces[prefix]; };
+            }
+
+            var result = doc.evaluate(expression, context, nsresolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+
+            return (result !== null ? result.singleNodeValue : null);
+
+        } else if (typeof context.selectSingleNode != "undefined") {
+            if (namespaces instanceof Object) {
+                var ns = "";
+                for (var prefix in namespaces) {
+                    if (namespaces.hasOwnProperty(prefix)) {
+                        ns += "xmlns:" + prefix + "='" + namespaces[prefix] + "' ";
+                    }
+                }
+                doc.setProperty("SelectionNamespaces", ns);
+            }
+            return context.selectSingleNode(expression);
+        } else {
+            throw new Error("no xpath engine found");
+        }
+    };
 }
 
 // define $$ object of window
