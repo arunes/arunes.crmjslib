@@ -1,6 +1,6 @@
 ﻿/* 
-arunes.crmjslib v1.0.5
-last update: 2013-02-20 15:51 +2 GMT
+arunes.crmjslib v1.0.6
+last update: 2013-05-02 13:29 +2 GMT
 */
 
 // class and constructor
@@ -551,6 +551,69 @@ function arunesCrmJsLib() {
                     default:
                         break;
                 }
+            }
+        }
+    };
+
+    this.getOptionSet = function (EntityLogicalName, LogicalName, MetadataId, RetrieveAsIfPublished) {
+        var request = "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">";
+        request += "<s:Body>";
+        request += "<Execute xmlns=\"http://schemas.microsoft.com/xrm/2011/Contracts/Services\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">";
+        request += "<request i:type=\"a:RetrieveAttributeRequest\" xmlns:a=\"http://schemas.microsoft.com/xrm/2011/Contracts\">";
+        request += "<a:Parameters xmlns:b=\"http://schemas.datacontract.org/2004/07/System.Collections.Generic\">";
+        request += "<a:KeyValuePairOfstringanyType>";
+        request += "<b:key>EntityLogicalName</b:key>";
+        request += "<b:value i:type=\"c:string\" xmlns:c=\"http://www.w3.org/2001/XMLSchema\">" + EntityLogicalName + "</b:value>";
+        request += "</a:KeyValuePairOfstringanyType>";
+        if (MetadataId == null) { MetadataId = "00000000-0000-0000-0000-000000000000"; }
+        request += "<a:KeyValuePairOfstringanyType>";
+        request += "<b:key>MetadataId</b:key>";
+        request += "<b:value i:type=\"ser:guid\"  xmlns:ser=\"http://schemas.microsoft.com/2003/10/Serialization/\">" + MetadataId + "</b:value>";
+        request += "</a:KeyValuePairOfstringanyType>";
+        request += "<a:KeyValuePairOfstringanyType>";
+        request += "<b:key>RetrieveAsIfPublished</b:key>";
+        request += "<b:value i:type=\"c:boolean\" xmlns:c=\"http://www.w3.org/2001/XMLSchema\">" + RetrieveAsIfPublished + "</b:value>";
+        request += "</a:KeyValuePairOfstringanyType>";
+        request += "<a:KeyValuePairOfstringanyType>";
+        request += "<b:key>LogicalName</b:key>";
+        request += "<b:value i:type=\"c:string\"   xmlns:c=\"http://www.w3.org/2001/XMLSchema\">" + LogicalName + "</b:value>";
+        request += "</a:KeyValuePairOfstringanyType>";
+        request += "</a:Parameters>";
+        request += "<a:RequestId i:nil=\"true\" /><a:RequestName>RetrieveAttribute</a:RequestName></request>";
+        request += "</Execute>";
+        request += "</s:Body>";
+        request += "</s:Envelope>";
+
+        var req = new XMLHttpRequest();
+        req.open("POST", this.getSoapUrl(), false);
+        req.setRequestHeader("Accept", "application/xml, text/xml, */*");
+        req.setRequestHeader("Content-Type", "text/xml; charset=utf-8");
+        req.setRequestHeader("SOAPAction", "http://schemas.microsoft.com/xrm/2011/Contracts/Services/IOrganizationService/Execute");
+        req.send(request);
+
+        var namespaces = { a: "http://schemas.microsoft.com/xrm/2011/Contracts", b: "http://schemas.datacontract.org/2004/07/System.Collections.Generic", c: "http://schemas.microsoft.com/xrm/2011/Metadata" };
+
+        if (req.responseXML != null) {
+            var attributeData = $$.selectSingleNode(req.responseXML, "//b:value", namespaces);
+
+            if (attributeData != null) {
+                var optionSet = new Array();
+                var options = $$.selectSingleNode(attributeData, "c:OptionSet//c:Options", namespaces);
+                for (var i = 0; i < options.childNodes.length; i++) {
+                    var item = {};
+                    var nValue = $$.selectSingleNode(options.childNodes[i], "c:Value", namespaces);
+                    var value = nValue.text || nValue.textContent;
+
+                    var cLabel = $$.selectSingleNode(options.childNodes[i], "c:Label", namespaces);
+                    var locLabel = $$.selectSingleNode(cLabel, "a:UserLocalizedLabel", namespaces);
+                    var nText = $$.selectSingleNode(locLabel, "a:Label", namespaces);
+                    var text = nText.text || nText.textContent;
+                    
+                    item.value = value;
+                    item.text = text;
+                    optionSet.push(item);
+                }
+                return optionSet;
             }
         }
     };
