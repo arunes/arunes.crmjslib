@@ -1,6 +1,6 @@
 ﻿/* 
-arunes.crmjslib v1.0.7
-last update: 2013-05-06 13:59 +2 GMT
+arunes.crmjslib v1.0.8
+last update: 2013-05-10 09:57 +2 GMT
 */
 
 // class and constructor
@@ -12,10 +12,10 @@ function arunesCrmJsLib() {
 	var consoleActive = "console" in window && typeof console != "undefined";
 	window.console = {
 		log: function(msg) { if(consoleActive) _console.log(msg); },
-		debug: function(msg) { if(consoleActive) _console.debug(msg); },
-		info: function(msg) { if(consoleActive) _console.info(msg); },
-		warn: function(msg) { if(consoleActive) _console.warn(msg); },
-		error: function(msg) { if(consoleActive) _console.error(msg); }
+		debug: function(msg) { if(consoleActive) { if(typeof _console.debug != "undefined") { _console.debug(msg); } else { _console.log(msg); } } },
+		info: function(msg) { if(consoleActive) { if(typeof _console.info != "undefined") { _console.info(msg); } else { _console.log(msg); } } },
+		warn: function(msg) { if(consoleActive) { if(typeof _console.warn != "undefined") { _console.warn(msg); } else { _console.log(msg); } } },
+		error: function(msg) { if(consoleActive) { if(typeof _console.error != "undefined") { _console.error(msg); } else { _console.log(msg); } } }
 	};
 	
     // if content in iframe
@@ -127,6 +127,21 @@ function arunesCrmJsLib() {
 		}
     };
 
+	// get web resource script async
+	this.getWRScript = function (webResource, callback) {
+        if(jQuery) {
+			webResource = "/" + ORG_UNIQUE_NAME + "/WebResources/" + webResource;
+			console.info("Loading webresource '" + webResource + "'.");
+			$.getScript(webResource, function () {
+				console.info("'" + webResource + "' loaded successfully!");
+				if (typeof callback == "function")
+					callback();
+			});
+		} else {
+			console.warn("getWRScript function needs jQuery library to execute. Please include jQuery.");
+        }
+    };
+	
     // set elm. value
     this.setValue = function (elmId, val) { 
 		try {
@@ -756,16 +771,16 @@ function arunesCrmJsLib() {
     };
 
     // open entity rec
-    this.openEntity = function (entiyName, id) {
+    this.openEntity = function (entityName, id) {
 	    try {
 			console.log("Opening '" + entityName + "' with id '" + id + "'.");
 			
 			id = id != undefined ? id.replace('{', '').replace('}', '') : null;
-			var url = this.getServerUrl() + "/main.aspx?etn=" + entiyName + (id != null ? "&id=" + id : "") + "&pagetype=entityrecord";
+			var url = this.getServerUrl() + "/main.aspx?etn=" + entityName + (id != null ? "&id=" + id : "") + "&pagetype=entityrecord";
 			var width = 1020;
 			var height = screen.height - 50;
 			var left = ((screen.width - width) / 2);
-			var windowName = entiyName + id.replace(/-/gi, '');
+			var windowName = entityName + id.replace(/-/gi, '');
 			window.open(url, windowName, 'width=1020,height=' + height + ',top=0,left=' + left + ', scrollbars=0,resizable=1');
 		} catch(e) {
 			console.warn("Opening '" + entityName + "' with id '" + id + "' is failed.");
