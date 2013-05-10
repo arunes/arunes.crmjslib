@@ -1,6 +1,6 @@
 ﻿/* 
-arunes.crmjslib v1.0.8
-last update: 2013-05-10 09:57 +2 GMT
+arunes.crmjslib v1.0.9
+last update: 2013-05-10 15:47 +2 GMT
 */
 
 // class and constructor
@@ -1019,6 +1019,82 @@ function arunesCrmJsLib() {
         }
     };
 
+	// retrieve all entities
+	this.retrieveAllEntities = function (successCallback, errorCallback, retrieveAsIfPublished, isCustomEntity, async) {
+		retrieveAsIfPublished = (retrieveAsIfPublished != undefined ? retrieveAsIfPublished : true);
+		isCustomEntity = (isCustomEntity != undefined ? isCustomEntity : true);
+		async = (async != undefined ? async : this.async);
+		
+		var requestMain = ""
+		requestMain += "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">";
+		requestMain += "  <s:Body>";
+		requestMain += "    <Execute xmlns=\"http://schemas.microsoft.com/xrm/2011/Contracts/Services\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">";
+		requestMain += "      <request i:type=\"a:RetrieveAllEntitiesRequest\" xmlns:a=\"http://schemas.microsoft.com/xrm/2011/Contracts\">";
+		requestMain += "        <a:Parameters xmlns:b=\"http://schemas.datacontract.org/2004/07/System.Collections.Generic\">";
+		requestMain += "          <a:KeyValuePairOfstringanyType>";
+		requestMain += "            <b:key>EntityFilters</b:key>";
+		requestMain += "            <b:value i:type=\"c:EntityFilters\" xmlns:c=\"http://schemas.microsoft.com/xrm/2011/Metadata\">Privileges</b:value>";
+		requestMain += "          </a:KeyValuePairOfstringanyType>";
+		requestMain += "          <a:KeyValuePairOfstringanyType>";
+		requestMain += "            <b:key>RetrieveAsIfPublished</b:key>";
+		requestMain += "            <b:value i:type=\"c:boolean\" xmlns:c=\"http://www.w3.org/2001/XMLSchema\">" + (retrieveAsIfPublished ? "true" : "false") + "</b:value>";
+		requestMain += "          </a:KeyValuePairOfstringanyType>";
+		requestMain += "        </a:Parameters>";
+		requestMain += "        <a:RequestId i:nil=\"true\" />";
+		requestMain += "        <a:RequestName>RetrieveAllEntities</a:RequestName>";
+		requestMain += "      </request>";
+		requestMain += "    </Execute>";
+		requestMain += "  </s:Body>";
+		requestMain += "</s:Envelope>";
+
+		var req = new XMLHttpRequest();
+		req.open("POST", this.getSoapUrl(), async);
+		req.setRequestHeader("Accept", "application/xml, text/xml, */*");
+		req.setRequestHeader("Content-Type", "text/xml; charset=utf-8");
+		req.setRequestHeader("SOAPAction", "http://schemas.microsoft.com/xrm/2011/Contracts/Services/IOrganizationService/Execute");
+		req.onreadystatechange = function () {
+			if (req.readyState == 4) {
+				if (req.status == 200) {
+					
+					var namespaces = { a: "http://schemas.microsoft.com/xrm/2011/Contracts", b: "http://schemas.datacontract.org/2004/07/System.Collections.Generic", c: "http://schemas.microsoft.com/xrm/2011/Metadata" };
+
+					var entityList = [];
+					if (req.responseXML != null) {
+						var entities = $$.selectSingleNode(req.responseXML, "//b:value", namespaces);
+						if (entities != null) {						
+							for (var i = 0; i < entities.childNodes.length; i++) {
+								var isCustomNode = $$.selectSingleNode(entities.childNodes[i], "c:IsCustomEntity", namespaces);
+								var isCustom = (isCustomNode.text || isCustomNode.textContent) === "true";
+								
+								if((isCustomEntity && isCustom) || !isCustomEntity) {
+									var typeCode = $$.selectSingleNode(entities.childNodes[i], "c:ObjectTypeCode", namespaces);
+									var logicalName = $$.selectSingleNode(entities.childNodes[i], "c:LogicalName", namespaces);
+									var displayNameNode = $$.selectSingleNode(entities.childNodes[i], "c:DisplayName", namespaces);
+									var locLabel = $$.selectSingleNode(displayNameNode, "a:UserLocalizedLabel", namespaces);
+									var locLabelText = $$.selectSingleNode(locLabel, "a:Label", namespaces);
+									var displayName = locLabelText != null ? (locLabelText.text || locLabelText.textContent) : logicalName;
+									
+									entityList.push({
+										objectTypeCode: typeCode.text || typeCode.textContent,
+										logicalName: logicalName.text || logicalName.textContent,
+										displayName: displayName
+									});
+								}
+							}
+						}
+					}
+					
+					if (typeof successCallback == "function") 
+						successCallback(entityList);
+				} else {
+					if(typeof errorCallback == "function") 
+						errorCallback(this._getError(req.responseXML));
+				}
+			}
+		};
+		req.send(requestMain);
+	};
+	   
     this._getError = function (faultXml) {
         ///<summary>
         /// Parses the WCF fault returned in the event of an error.
